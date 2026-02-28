@@ -43,6 +43,7 @@ import javax.inject.Singleton
 import com.mobilekinetic.agent.data.DiagnosticLogger
 import com.mobilekinetic.agent.data.preferences.SettingsRepository
 import com.mobilekinetic.agent.data.preferences.UserPreferences
+import com.mobilekinetic.agent.data.vault.CredentialVault
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
@@ -59,7 +60,8 @@ import kotlinx.coroutines.flow.onEach
 @Singleton
 class ClaudeProcessManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val credentialVault: CredentialVault
 ) {
     companion object {
         private const val TAG = "ClaudeProcessManager"
@@ -353,6 +355,14 @@ class ClaudeProcessManager @Inject constructor(
             // Phase 2C: Read current user preferences for MKA_* env vars
             val userPrefs: UserPreferences = settingsRepository.userPreferences.first()
 
+            // Read API key from CredentialVault (AES-256-GCM, no biometric gate)
+            val apiKey: String? = try {
+                credentialVault.get("ANTHROPIC_API_KEY")
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to read API key from vault: ${e.message}")
+                null
+            }
+
             val nativeLibDir = context.applicationInfo.nativeLibraryDir
             val env = buildMap {
                 // HOME must be internal filesDir/home — NOT external storage.
@@ -373,6 +383,10 @@ class ClaudeProcessManager @Inject constructor(
                 put("RAG_ENDPOINT", "http://127.0.0.1:5562")
                 // Pass selected model to orchestrator
                 put("ANTHROPIC_MODEL", _selectedModel.value)
+                // Inject API key from vault if available
+                if (!apiKey.isNullOrBlank()) {
+                    put("ANTHROPIC_API_KEY", apiKey)
+                }
 
                 // Phase 2C: MKA_* env vars — user preferences for on-device Claude
                 put("MKA_USER_NAME", userPrefs.userName.ifEmpty { "User" })

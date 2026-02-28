@@ -47,6 +47,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import com.mobilekinetic.agent.ui.viewmodel.SetupWizardViewModel.ApiKeyState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -322,7 +323,14 @@ private fun AiProviderPage(viewModel: SetupWizardViewModel) {
         // API Key
         OutlinedTextField(
             value = viewModel.apiKey,
-            onValueChange = { viewModel.apiKey = it },
+            onValueChange = {
+                viewModel.apiKey = it
+                // Reset validation state when key changes
+                if (viewModel.apiKeyValidationState != ApiKeyState.IDLE) {
+                    viewModel.apiKeyValidationState = ApiKeyState.IDLE
+                    viewModel.apiKeyValidationMessage = ""
+                }
+            },
             label = { Text("Anthropic API Key") },
             placeholder = { Text("sk-ant-...") },
             visualTransformation = if (viewModel.apiKeyVisible) {
@@ -342,6 +350,40 @@ private fun AiProviderPage(viewModel: SetupWizardViewModel) {
             modifier = Modifier.fillMaxWidth(),
             colors = wizardTextFieldColors()
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Validate button + status
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            OutlinedButton(
+                onClick = { viewModel.validateApiKey() },
+                enabled = viewModel.apiKey.isNotBlank() && viewModel.apiKeyValidationState != ApiKeyState.VALIDATING,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = LcarsBlue)
+            ) {
+                Text(
+                    when (viewModel.apiKeyValidationState) {
+                        ApiKeyState.VALIDATING -> "Validating..."
+                        ApiKeyState.VALID -> "Validated"
+                        else -> "Validate Key"
+                    }
+                )
+            }
+            if (viewModel.apiKeyValidationMessage.isNotBlank()) {
+                Text(
+                    text = viewModel.apiKeyValidationMessage,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = when (viewModel.apiKeyValidationState) {
+                        ApiKeyState.VALID -> LcarsGreen
+                        ApiKeyState.INVALID, ApiKeyState.ERROR -> MaterialTheme.colorScheme.error
+                        else -> LcarsSubduedWarm
+                    }
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
         HorizontalDivider(color = LcarsSubduedCool.copy(alpha = 0.2f))
