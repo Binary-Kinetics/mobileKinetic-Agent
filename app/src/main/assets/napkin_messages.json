@@ -1,0 +1,98 @@
+{
+  "version": "1.0",
+  "description": "NapkinDab Phase 5 configuration — mid-session context cleanup for mK:a",
+  "threshold_exchanges": 50,
+  "max_buffer_size": 200,
+  "cleanup_messages": [
+    "Tidying up context...",
+    "Organizing recent memories...",
+    "Refreshing context window...",
+    "Compacting session history..."
+  ],
+  "categories": {
+    "tool_output": {
+      "description": "Raw output from bash/python tool calls",
+      "default_score": 0.1,
+      "removable": true,
+      "notes": "High volume, low retention value after acknowledgment"
+    },
+    "scaffold": {
+      "description": "Structural injection markers, session headers, phase labels",
+      "default_score": 0.1,
+      "removable": true,
+      "notes": "Pure scaffolding -- no semantic content after setup phase"
+    },
+    "injection_ack": {
+      "description": "Assistant acknowledgment of a memory injection",
+      "default_score": 0.15,
+      "removable": true,
+      "notes": "Once acknowledged, the ack itself has no retention value"
+    },
+    "repeated_context": {
+      "description": "Duplicate or near-duplicate context blocks",
+      "default_score": 0.05,
+      "removable": true,
+      "notes": "Detected by content comparison in MessageBuffer"
+    },
+    "old_memory_dump": {
+      "description": "Full memory dump injections from earlier in session",
+      "default_score": 0.1,
+      "removable": true,
+      "notes": "Superseded by more recent injections or NapkinDab summaries"
+    },
+    "user_message": {
+      "description": "Direct messages from the user",
+      "default_score": 1.0,
+      "removable": false,
+      "notes": "Never remove -- user messages define the session intent"
+    },
+    "system_prompt": {
+      "description": "System prompt and base instructions",
+      "default_score": 1.0,
+      "removable": false,
+      "notes": "Core behavioral context"
+    },
+    "priority_injection": {
+      "description": "High-priority memory injected at session start or by trigger",
+      "default_score": 1.0,
+      "removable": false,
+      "notes": "Tier 0/1 injections -- always retained"
+    },
+    "critical_warning": {
+      "description": "Warnings about dangerous actions, irreversible operations",
+      "default_score": 1.0,
+      "removable": false,
+      "notes": "Safety content -- never remove"
+    },
+    "task_context": {
+      "description": "Current task description, goals, constraints",
+      "default_score": 1.0,
+      "removable": false,
+      "notes": "Defines what the assistant is trying to accomplish"
+    }
+  },
+  "dab_defaults": {
+    "trigger_threshold_exchanges": 50,
+    "keep_last_n_messages": 100,
+    "max_buffer_size": 200,
+    "protected_tail_turns": 3,
+    "min_score_to_drop": 0.5
+  },
+  "napkin_event_messages": [
+    {
+      "id": "dab_001",
+      "trigger": "threshold_reached",
+      "message": "[NAPKIN_DAB] Exchange {exchange}. Compacted buffer: {before} to {after} messages. Session focus preserved."
+    },
+    {
+      "id": "dab_002",
+      "trigger": "buffer_full",
+      "message": "[NAPKIN_DAB] Buffer at capacity ({size} msgs). Trimmed to last {keep} exchanges."
+    },
+    {
+      "id": "dab_003",
+      "trigger": "manual_trigger",
+      "message": "[NAPKIN_DAB] Manual compact. Removed {removed} messages. Core context intact."
+    }
+  ]
+}

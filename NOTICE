@@ -1,0 +1,21 @@
+mobileKinetic:Agent (mK:a)
+Copyright 2026 Binary Kinetics
+
+This application is based in part on Termux (https://github.com/termux/termux-app),
+which is licensed under the GNU General Public License v3.0.
+
+The terminal emulator and terminal view modules are derived from the Termux project:
+  - terminal-emulator: Based on termux/termux-app terminal-emulator module
+  - terminal-view: Based on termux/termux-app terminal-view module
+
+Termux is copyright its contributors and licensed under GPLv3.
+See https://github.com/termux/termux-app/blob/master/LICENSE.md for details.
+
+This application also uses the following open-source components:
+
+  - ONNX Runtime (MIT License) - https://github.com/microsoft/onnxruntime
+  - all-MiniLM-L6-v2 (Apache 2.0) - https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
+  - NanoHTTPD (BSD License) - https://github.com/NanoHttpd/nanohttpd
+  - SQLCipher (BSD License) - https://www.zetetic.net/sqlcipher/
+  - OkHttp (Apache 2.0) - https://square.github.io/okhttp/
+  - Ktor (Apache 2.0) - https://ktor.io/

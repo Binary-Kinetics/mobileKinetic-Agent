@@ -1,0 +1,1393 @@
+{
+    "version": 1,
+    "created": "2026-02-27",
+    "description": "mK:a RAG seed data for resolver",
+    "entries": [
+        {
+            "text": "[TOOL] | camera_photo | Snap a picture with device camera | camera_id:s? flash:s? quality:i? | file path to saved photo",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "camera_photo",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | camera_list | List available cameras | (none) | camera IDs facing direction capabilities",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "camera_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | camera_video_start | Start recording video | camera_id:s? max_duration_seconds:i? quality:s? | recording status",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "camera_video_start",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | camera_video_stop | Stop video recording | (none) | file path duration size",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "camera_video_stop",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | camera_status | Get current camera status | (none) | recording active camera info",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "camera_status",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | audio_record_start | Start recording audio | max_duration_seconds:i? output_format:s? source:s? | recording status file path",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "audio_record_start",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | audio_record_stop | Stop audio recording | (none) | file path duration size",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "audio_record_stop",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | audio_status | Get audio recording status | (none) | recording state duration path",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "audio_status",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | browser_open | Open URL in device browser | url:s! showTitle:b? toolbarColor:s? shareState:s? | opens Chrome Custom Tabs",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "browser_open",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | browser_prefetch | Pre-warm browser for instant loading | url:s! | prefetch started",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "browser_prefetch",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | sms_send | Send a text message | phone_number:s! message:s! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "sms_send",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | sms_list | Read SMS messages | type:s? limit:i? | messages with sender body date read status",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "sms_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | mms_list | List MMS messages | box:s? limit:i? offset:i? | MMS messages with metadata",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "mms_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | mms_read | Read a single MMS message | id:i! include_media:b? | MMS metadata addresses parts",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "mms_read",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | mms_send | Send an MMS message | recipients:list! message:s? subject:s? image_uri:s? image_base64:s? image_content_type:s? | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "mms_send",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | notifications_active | Read all active notifications | package_filter:s? | notification keys titles text actions",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "notifications_active",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | notifications_reply | Reply to a messaging notification | key:s! reply_text:s! action_index:i? | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "notifications_reply",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | notifications_dismiss | Dismiss a single notification | key:s! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "notifications_dismiss",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | notifications_dismiss_all | Clear all notifications | (none) | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "notifications_dismiss_all",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | notifications_status | Check notification listener status | (none) | service running and permission status",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "notifications_status",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | notification_send | Send a notification to device | title:s! text:s! id:i? priority:s? style:s? style_data:s? deep_link:s? actions:list? category:s? color:s? group:s? silent:b? ongoing:b? auto_cancel:b? timeout_after:i? sub_text:s? | notification posted",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "notification_send",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | battery_info | Check battery level and charging status | (none) | level percentage charging health temperature",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "battery_info",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tts_speak | Speak text aloud | text:s! | speaks via Android TTS",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tts_speak",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | vibrate | Vibrate the device | duration_ms:i? effect:s? pattern:list? | vibrates",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "vibrate",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | vibrate_effect | Trigger a predefined vibration effect | effect:s! | vibration effect played",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "vibrate_effect",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | vibrate_pattern | Vibrate with a custom pattern | pattern:list! repeat:i? | pattern vibration played",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "vibrate_pattern",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | vibrate_cancel | Cancel ongoing vibration | (none) | vibration cancelled",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "vibrate_cancel",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | location_get | Get current GPS location | (none) | latitude longitude accuracy altitude",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "location_get",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | gnss_status | Get GNSS satellite status | (none) | fix state satellite count CNR azimuth elevation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "gnss_status",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | torch_control | Turn flashlight on or off | enabled:b! | torch state",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "torch_control",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | brightness | Set screen brightness | level:i! | brightness 0-255",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "brightness",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | screen_state | Get screen on/off and brightness | (none) | screen_on brightness brightness_mode",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "screen_state",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | volume_get | Get current volume levels | (none) | ring media alarm notification system levels",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "volume_get",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | volume_set | Set volume for audio stream | stream:s! level:i! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "volume_set",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | dnd | Set Do Not Disturb mode | mode:s! | off priority alarms total_silence",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "dnd",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | clipboard_get | Read clipboard contents | (none) | clipboard text",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "clipboard_get",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | clipboard_set | Copy text to clipboard | text:s! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "clipboard_set",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | contacts_list | List phone contacts | limit:i? | contacts with names phones emails",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "contacts_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | calendar_list | List all calendars on device | (none) | calendar IDs names accounts",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "calendar_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | calendar_events | Get upcoming calendar events | calendar_id:i? days:i? | events with titles dates locations",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "calendar_events",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | calendar_create | Create a calendar event | calendar_id:i! title:s! start_time:n! end_time:n! description:s? location:s? all_day:b? | event ID",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "calendar_create",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | calendar_update | Update an existing calendar event | event_id:i! title:s? start_time:n? end_time:n? description:s? location:s? all_day:b? | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "calendar_update",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasks_list | List tasks | limit:i? | tasks with summaries and status",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasks_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasks_create | Create a new task | summary:s! description:s? due:n? start:n? priority:i? status:s? | task ID",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasks_create",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasks_update | Update an existing task | id:i! summary:s? description:s? priority:i? status:s? percent:i? | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasks_update",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasks_delete | Delete a task | task_id:i! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasks_delete",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | sensor_read | Read device sensors | sensor_types:list! sampling_rate:s? | sensor readings with values accuracy timestamp",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "sensor_read",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | sensors_list | List all available sensors | (none) | sensor names types vendors ranges",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "sensors_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | sensors_orientation | Get device orientation | (none) | azimuth pitch roll",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "sensors_orientation",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | sensors_trigger | Wait for significant motion | timeout_ms:i? | motion detected or timeout",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "sensors_trigger",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | wifi_scan | Scan nearby WiFi networks | (none) | SSIDs signal strengths frequencies",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "wifi_scan",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | wifi_info | Get WiFi connection info | (none) | SSID BSSID IP link_speed frequency",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "wifi_info",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | bluetooth_scan | Scan for Bluetooth devices | duration_seconds:i? | device names addresses types",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "bluetooth_scan",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | bluetooth_headset_status | Get Bluetooth headset status | (none) | connected devices audio state",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "bluetooth_headset_status",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | bluetooth_headset_voice_recognition | Control headset voice recognition | action:s! device_address:s? | voice recognition started or stopped",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "bluetooth_headset_voice_recognition",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | network_capabilities | Get network connection details | (none) | transport type capabilities link properties",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "network_capabilities",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | network_request | Request specific network type | transport_type:s? capabilities:list? min_bandwidth_kbps:i? | network connection",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "network_request",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | network_info | Get network interfaces and routing | (none) | interfaces addresses routes",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "network_info",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | data_usage | Get data usage statistics | days:i? | mobile wifi usage bytes",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "data_usage",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | media_playing | Get currently playing media | (none) | track title artist album state",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "media_playing",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | media_control | Control media playback | action:s! | play pause next previous stop",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "media_control",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | phone_call | Make a phone call | phone_number:s! | initiates call",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "phone_call",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | phone_hangup | End active phone call | (none) | hangs up",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "phone_hangup",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | phone_state | Get telephony state | (none) | call_state network carrier sim_state",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "phone_state",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | call_log | Get recent call history | limit:i? | calls with numbers names types dates durations",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "call_log",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | toast | Show toast message on screen | text:s! duration:s? | short or long toast",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "toast",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | share | Share content via Android share sheet | text:s? htmlText:s? subject:s? type:s? streamUri:s? streamUris:list? emailTo:list? emailCc:list? emailBcc:list? chooserTitle:s? | opens share dialog",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "share",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | share_received | Get most recent incoming share | (none) | shared content type data",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "share_received",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | apps_list | List installed apps | show_system:b? | app names packages versions",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "apps_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | apps_info | Get detailed app info | package:s! | app details permissions activities",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "apps_info",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | apps_resolve | Find apps that handle an intent | action:s! data:s? mimeType:s? | matching app packages",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "apps_resolve",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | apps_find_by_permission | Find apps with a permission | permission:s! | app packages with permission",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "apps_find_by_permission",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | apps_changes | Get recent app installs/updates/uninstalls | sequenceNumber:i? | changed packages",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "apps_changes",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | apps_components | List app activities services receivers | package:s! | components list",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "apps_components",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | apps_defaults | Get default app handlers | (none) | browser SMS dialer launcher email camera maps",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "apps_defaults",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | system_info | Get device system information | (none) | model manufacturer OS SDK RAM SoC",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "system_info",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | process_list | List running processes | (none) | process names PIDs memory",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "process_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | shell_execute | Run a shell command | command:s! timeout:i? | command output",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "shell_execute",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | file_read | Read a file | path:s! lines:i? | file contents",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "file_read",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | file_write | Write a file | path:s! content:s! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "file_write",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | file_list | List directory contents | path:s! pattern:s? | files with sizes and types",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "file_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | photos_recent | Get recent photo metadata | limit:i? | photo paths dates sizes dimensions",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "photos_recent",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | downloads | List recent downloads | limit:i? | download files paths sizes dates",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "downloads",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | download_enqueue | Download a file from URL | url:s! filename:s? destination:s? title:s? description:s? wifi_only:b? | download ID",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "download_enqueue",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | download_status | Check download progress | download_id:i? | status progress bytes",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "download_status",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | geofence_add | Add a geographic fence trigger | geofence_id:s! latitude:n! longitude:n! radius_meters:n? transition_types:list? expiration_ms:i? loitering_delay_ms:i? | geofence ID",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "geofence_add",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | geofence_remove | Remove a geofence | geofence_id:s! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "geofence_remove",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | geofence_list | List active geofences | (none) | geofence IDs parameters status",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "geofence_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | alarm_set | Set a device alarm | trigger_time_ms:n! alarm_type:s? message:s? wake_device:b? | alarm set confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "alarm_set",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | alarm_schedule | Schedule a precise alarm | trigger_time_ms:n! alarm_type:s? message:s? repeating_interval_ms:i? | alarm ID",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "alarm_schedule",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | alarm_cancel | Cancel a scheduled alarm | alarm_id:s! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "alarm_cancel",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | intent_broadcast | Send an Android broadcast intent | action:s! extras:s? package:s? permission:s? broadcastOptions:s? | broadcast sent",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "intent_broadcast",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | intent_activity | Launch an Android activity | action:s! data:s? mimeType:s? package:s? extras:s? categories:list? flags:i? resolveFirst:b? | activity launched",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "intent_activity",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | input_keyevent | Send input key event | keycode:i! | key event sent",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "input_keyevent",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_run | Run a Tasker task | task_name:s! | task execution result",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_run",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_tasks | List available Tasker tasks | (none) | task names",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_tasks",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_variable | Set a Tasker variable | name:s! value:s! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_variable",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_profile | Enable or disable a Tasker profile | name:s! enabled:b? | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_profile",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | biometric_status | Get biometric authentication status | (none) | capabilities enrollment status",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "biometric_status",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | accounts_list | List device accounts | (none) | account types names",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "accounts_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | features_list | List device hardware features | (none) | NFC camera sensors etc",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "features_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | modules_list | List installed Android modules | (none) | module names packages",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "modules_list",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | logcat | Get device log output | lines:i? tag:s? priority:s? | log entries",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "logcat",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | health_check | Check all API endpoint health | (none) | endpoint status report",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "health_check",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | work_schedule | Schedule background work | worker_tag:s! worker_class:s? interval_minutes:i? initial_delay_minutes:i? constraints:s? input_data:s? | work scheduled",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "work_schedule",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | work_status | Get background work status | worker_tag:s? | work state info",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "work_status",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | work_cancel | Cancel background work | worker_tag:s! | confirmation",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "work_cancel",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | rlm_analyze | Deep recursive analysis with AI agents | query:s! mode:s? model:s? max_iterations:i? context_text:s? context_file:s? directory:s? categories:list? extensions:list? timeout_ms:i? include_session_memory:b? use_task_tool:b? | analysis result",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "rlm_analyze",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | ha_get_state | Get Home Assistant entity state | entity_id:s! | entity state attributes",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "ha_get_state",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | ha_get_states | Get all Home Assistant entity states | domain:s? | all entity states",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "ha_get_states",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | ha_call_service | Call a Home Assistant service | domain:s! service:s! entity_id:s? data:s? | service call result",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "ha_call_service",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | ha_get_services | List Home Assistant services | domain:s? | available services",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "ha_get_services",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | ha_render_template | Render Home Assistant Jinja2 template | template:s! | rendered template output",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "ha_render_template",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_lamp_on | Turn lamp ON via Tasker automation | (none) | lamp turned on",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_lamp_on",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_lamp_off | Turn lamp OFF via Tasker automation | (none) | lamp turned off",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_lamp_off",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_play_music | Play music via Tasker automation | query:s! | music playing",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_play_music",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_browse_url | Open URL in browser via Tasker | url:s! | URL opened",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_browse_url",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_screenshot | Take a screenshot via Tasker | (none) | screenshot captured",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_screenshot",
+                "version": 1
+            }
+        },
+        {
+            "text": "[TOOL] | tasker_print | Print a document via Tasker | text:s! | document printed",
+            "category": "tool",
+            "metadata": {
+                "domain": "TOOL",
+                "tool_name": "tasker_print",
+                "version": 1
+            }
+        },
+        {
+            "text": "[DESIGN] | colors | Primary orange #FCB45B, purple #3723C9, blue #58C6FE, pink #F98CFF, cyan #45BFFF | bg #000000 surface #1A1A1A panel #202020 card #0A0A0A | text #DEDEDE body #A4A4A4 secondary #4C4C4C taupe #827668 borders #454545 error #FF6B6B",
+            "category": "design",
+            "metadata": {
+                "domain": "DESIGN",
+                "key": "colors",
+                "version": 1
+            }
+        },
+        {
+            "text": "[DESIGN] | typography | Myriad Pro ONLY. Fallback: Source Sans Pro, sans-serif | Light 300 Regular 400 Semibold 600 Bold 700 BlackSemiExt 900 | Never use condensed variants",
+            "category": "design",
+            "metadata": {
+                "domain": "DESIGN",
+                "key": "typography",
+                "version": 1
+            }
+        },
+        {
+            "text": "[DESIGN] | layout | Border radius 4px buttons 8px cards 50% circles | Dark theme always, card-based, high contrast | Panel outer #202020 inner #1A1A1A border 1px #F89839",
+            "category": "design",
+            "metadata": {
+                "domain": "DESIGN",
+                "key": "layout",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | tier1 | Kotlin NanoHTTPD device API server on localhost. 45+ Android API endpoints. Direct hardware access for camera sensors GPS WiFi Bluetooth etc",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "tier1",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | tier2 | Python device API server on localhost. Shell operations file management and system commands",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "tier2",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | rag | On-device RAG system with local embeddings. Quick-lookup knowledge storage for tools commands and learned facts. Not for bulk document storage",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "rag",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | mcp | MCP layer wraps device API tiers plus RAG Tasker and Home Assistant into unified tool interface for the AI assistant",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "mcp",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | home_dir | App home directory is at internal storage under the app data path. Use file_list to explore. Do not attempt to access external storage paths",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "home_dir",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | safe_storage | ~/ClaudeShares/ directory survives app reinstalls. Store persistent data design assets and shared files here",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "safe_storage",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | tts_voices | Kokoro TTS voices: af_heart (default female), af_bella, af_nicole, af_aoede, af_kore, af_sarah, af_sky, am_adam, am_echo, am_liam, am_michael, am_onyx, am_puck, am_santa, bf_alice, bf_lily, bf_emma, bm_george, bm_lewis, bm_daniel. Prefix a=American b=British f=female m=male",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "tts_voices",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | tts_usage | To speak aloud use tts_speak with text parameter. Voice can be changed in Settings. Kokoro TTS provides natural high-quality speech synthesis. Speak responses when asked to talk or read aloud",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "tts_usage",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | terminal | The embedded terminal runs bash in the app sandbox. Use shell_execute for single commands. The home directory contains scripts configs and data. Python 3 and Node.js are available",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "terminal",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | rag_usage | To add a memory use the RAG API. Memories are embedded locally and stored in the on-device database. Use categories like tool system user warning. Query RAG before answering questions about device capabilities or past interactions",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "rag_usage",
+                "version": 1
+            }
+        },
+        {
+            "text": "[SYSTEM] | quickapps | QuickApps: generate on-demand single-page web apps. Write HTML to ~/QuickApps/ serve on localhost and open in browser. Auto-cleanup after 10 minutes. Good for dashboards visualizations and quick tools",
+            "category": "system",
+            "metadata": {
+                "domain": "SYSTEM",
+                "key": "quickapps",
+                "version": 1
+            }
+        },
+        {
+            "text": "[WARNING] | sdcard_hang | NEVER access /sdcard or /storage/emulated paths -- these will hang permanently due to FUSE deadlock in app sandbox context",
+            "category": "warning",
+            "metadata": {
+                "domain": "WARNING",
+                "key": "sdcard_hang",
+                "version": 1
+            }
+        },
+        {
+            "text": "[WARNING] | termux_hang | NEVER run termux-* commands -- there is no Termux IPC bridge and these will hang forever",
+            "category": "warning",
+            "metadata": {
+                "domain": "WARNING",
+                "key": "termux_hang",
+                "version": 1
+            }
+        },
+        {
+            "text": "[WARNING] | ripgrep_hang | NEVER use the Grep/ripgrep tool -- ripgrep is not available on ARM64 and will hang the process",
+            "category": "warning",
+            "metadata": {
+                "domain": "WARNING",
+                "key": "ripgrep_hang",
+                "version": 1
+            }
+        },
+        {
+            "text": "[WARNING] | pkg_broken | NEVER use pkg or apt package managers -- they have broken paths in this environment. Use pre-installed tools only",
+            "category": "warning",
+            "metadata": {
+                "domain": "WARNING",
+                "key": "pkg_broken",
+                "version": 1
+            }
+        },
+        {
+            "text": "[WARNING] | external_storage | Do not write to /storage/emulated/0 or any external storage path. All file operations should stay within the app home directory tree",
+            "category": "warning",
+            "metadata": {
+                "domain": "WARNING",
+                "key": "external_storage",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | getting_started | You are an AI assistant running on an Android device with 45+ hardware tools. You can check battery read sensors take photos send messages control media manage calendar and tasks and much more. Ask what the user needs help with",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "getting_started",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | tool_format | Tool entries use format: tool_name | description | parameters | return values. Parameter types: s=string i=integer n=number b=boolean list=array. ! means required ? means optional",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "tool_format",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | tasker_integration | Tasker tasks extend device capabilities. Use tasker_tasks to list available tasks then tasker_run to execute them. Tasker can automate complex workflows including smart home control media playback screenshots and more",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "tasker_integration",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | home_assistant | Home Assistant integration lets you control smart home devices. Use ha_get_states to discover entities ha_get_state for specific devices and ha_call_service to control them. Common domains: light switch climate media_player sensor",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "home_assistant",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | sensor_types | Available sensor types for sensor_read: accelerometer gyroscope magnetometer barometer light proximity gravity rotation_vector step_counter ambient_temperature relative_humidity. Not all sensors available on every device",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "sensor_types",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | messaging | To send SMS use sms_send with phone_number and message. To read messages use sms_list with optional type filter (inbox sent draft). For MMS with images use mms_send with recipients and optional image_uri or image_base64",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "messaging",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | calendar_tasks | Calendar: use calendar_list to find calendars then calendar_events to view upcoming items. Tasks: use tasks_list to see current tasks tasks_create to add new ones. Times are Unix timestamps in milliseconds",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "calendar_tasks",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | media_control | Check what is playing with media_playing. Control playback with media_control using actions: play pause next previous stop. Works with any active media session on the device",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "media_control",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | notifications | Read active notifications with notifications_active. Reply to messaging notifications with notifications_reply using the notification key. Dismiss individual or all notifications. Send custom notifications with notification_send",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "notifications",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | geofencing | Create location-based triggers with geofence_add. Specify latitude longitude and radius. Transition types: enter exit dwell. Use geofence_list to see active fences and geofence_remove to delete them",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "geofencing",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | file_operations | Use file_list to browse directories file_read to view contents and file_write to create or update files. All paths are relative to the app home directory. Use downloads to see downloaded files",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "file_operations",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | network_tools | Check WiFi with wifi_info or scan networks with wifi_scan. Get full network details with network_info and network_capabilities. Check data usage with data_usage. Scan Bluetooth devices with bluetooth_scan",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "network_tools",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | device_control | Control screen brightness with brightness tool (0-255). Toggle flashlight with torch_control. Set volume with volume_set for streams: ring media alarm notification system. Set Do Not Disturb with dnd tool",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "device_control",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | rlm_usage | RLM (Recursive Language Model) provides deep analysis capabilities. Use rlm_analyze with a query and optional context. Modes: text (direct input) file (analyze a file) codebase (analyze a directory). Good for complex reasoning tasks",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "rlm_usage",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | work_scheduling | Schedule background tasks with work_schedule. Specify worker_tag interval_minutes and optional constraints. Check status with work_status and cancel with work_cancel. Good for periodic health checks or data sync",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "work_scheduling",
+                "version": 1
+            }
+        },
+        {
+            "text": "[GUIDE] | intent_system | Android intents let you interact with other apps. Use intent_activity to launch activities and intent_broadcast to send broadcasts. Use apps_resolve to find which apps handle specific intent actions",
+            "category": "guide",
+            "metadata": {
+                "domain": "GUIDE",
+                "key": "intent_system",
+                "version": 1
+            }
+        }
+    ]
+}

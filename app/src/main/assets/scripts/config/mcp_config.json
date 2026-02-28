@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "unified-device": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/unified_device_mcp.py"
+      ],
+      "description": "Unified Device MCP - 93 tools covering RAG memory, Tasker automation, all Tier 1 hardware APIs and Tier 2 system APIs",
+      "env": {}
+    }
+  }
+}

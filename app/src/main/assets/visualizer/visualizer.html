@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Audio Visualizer</title>
+  <script src="https://unpkg.com/three@0.132.2/build/three.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent; /* LAYER_ORDER: html/body transparent so Android background shows through */
+    }
+    #container {
+      width: 100%;
+      height: 100%;
+      background: transparent; /* LAYER_ORDER: container transparent for layered rendering */
+    }
+    canvas {
+      display: block;
+      background: transparent; /* LAYER_ORDER: canvas transparent for WebGL alpha compositing */
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+
+  <script>
+    // AudioKinetics Sphere Visualization
+    // Particles bounce inside a wireframe sphere grid
+    // Cells flash when particles collide with the sphere wall
+
+    let scene, camera, renderer;
+    let group, sphereGrid, innerGroup;
+    const sphereCells = [];
+
+    // Particle system
+    let particles, pointCloud, particlePositions;
+    let linesMesh, positions, colors;
+    const particlesData = [];
+
+    // Settings - matched to original AudioKinetics
+    // Sphere is created at 400 but scaled down to 64-128 range
+    const settings = {
+      particleCount: 64,
+      maxParticleCount: 1000,
+      baseRadius: 400,           // Base radius for geometry creation
+      minRadius: 72,             // Minimum display radius (no audio)
+      maxRadius: 110,            // Maximum display radius (full audio) - 15% larger for more dramatic pulsing
+      latSegments: 16,           // Match original: 16 latitude bands
+      lonSegments: 32,           // Match original: 32 longitude bands
+      minDistance: 48,           // Match original: connection distance
+      limitConnections: true,
+      maxConnections: 12,        // Match original: max connections per particle
+      sphereColor: 0x353535,     // Darker gray wireframe
+      flashColor: 0xffffff,      // White flash on collision
+      sustainColor: 0x45BEFF,    // Cyan sustain color (match original)
+      dotColor: 0xffffff,        // White particles
+      lineColor: 0xFF8645,       // Warm Orange - LCARS color!
+      decayTime: 1500            // Match original: 1.5 second decay
+    };
+
+    // Audio reactivity state
+    let audioLevel = 0;
+    let smoothedAudioLevel = 0;  // Smoothed version for natural pulsing
+    let isPlaying = false;
+    let targetRadius = settings.minRadius;     // Target radius based on audio level
+    let containerRadius = settings.minRadius;  // Actual radius, smoothly chases target
+
+    // Velocity perturbation to break convergence patterns
+    let lastPerturbTime = 0;
+    const PERTURB_INTERVAL = 90000; // every 90 seconds
+    const PERTURB_DURATION = 2000;  // 2 seconds transition
+    let perturbActive = false;
+    let perturbStartTime = 0;
+    let perturbTargets = [];
+
+    // Claude state tracking
+    let currentClaudeState = 'idle';  // 'idle' | 'processing' | 'processing_subagent' | 'processing_subagent_stale' | 'stopped'
+    let subagentCrashed = false;      // When true, cell hits use police flash instead of sustain
+
+    // Store default colors for idle state restoration
+    const defaultColors = {
+      sphereColor: settings.sphereColor,
+      flashColor: settings.flashColor,
+      sustainColor: settings.sustainColor,
+      lineColor: settings.lineColor,
+      dotColor: settings.dotColor
+    };
+
+    // --- Addressable multi-color system ---
+    // Sustain color palette: each entry has {color: THREE.Color, weight: 0-1}
+    // When a cell flashes, it picks a sustain color randomly based on weights
+    const sustainColorPalette = [
+      { color: new THREE.Color(settings.sustainColor), weight: 1.0 }
+    ];
+
+    // Line color palette: each entry has {color: THREE.Color, weight: 0-1}
+    // Each line segment picks a color randomly based on weights each frame
+    const lineColorPalette = [
+      { color: new THREE.Color(settings.lineColor), weight: 1.0 }
+    ];
+
+    // Police flash constants (infrastructure — not triggered yet)
+    const POLICE_COLORS = [
+      new THREE.Color(0xFF0000),  // Red
+      new THREE.Color(0xFFFFFF),  // White
+      new THREE.Color(0xFFFF00)   // Yellow
+    ];
+    const POLICE_CYCLE_MS = 150;   // Time per color in the cycle
+    const POLICE_HOLD_MS = 4000;   // Hold duration before fade
+
+    function pickSustainColor() {
+      const rand = Math.random();
+      let cumulative = 0;
+      for (const entry of sustainColorPalette) {
+        cumulative += entry.weight;
+        if (rand <= cumulative) return entry.color.clone();
+      }
+      return sustainColorPalette[sustainColorPalette.length - 1].color.clone();
+    }
+
+    function pickLineColor() {
+      const rand = Math.random();
+      let cumulative = 0;
+      for (const entry of lineColorPalette) {
+        cumulative += entry.weight;
+        if (rand <= cumulative) return entry.color;
+      }
+      return lineColorPalette[lineColorPalette.length - 1].color;
+    }
+
+    function init() {
+      const container = document.getElementById('container');
+
+      // Scene
+      scene = new THREE.Scene();
+
+      // Camera - positioned to match original viewing angle
+      camera = new THREE.PerspectiveCamera(
+        45,
+        container.clientWidth / container.clientHeight,
+        1,
+        4000
+      );
+      camera.position.x = 45;
+      camera.position.y = 45;
+      camera.position.z = 250;
+      camera.lookAt(0, 0, 0);  // Keep camera centered on sphere
+
+      // Renderer with transparency
+      // LAYER_ORDER: WebGLRenderer alpha:true enables transparent WebGL canvas
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true
+      });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setClearColor(0x000000, 0); // LAYER_ORDER: alpha=0 makes clear color fully transparent
+      container.appendChild(renderer.domElement);
+
+      // Main group for rotation
+      group = new THREE.Group();
+      scene.add(group);
+
+      // No backdrop needed - Compose layer handles occlusion with asymmetric soft edges
+      // WebView is fully transparent, showing just the sphere animation
+
+      // Create visualization elements
+      createSphereGrid();
+      createParticleSystem();
+
+      // Handle resize
+      window.addEventListener('resize', onWindowResize);
+
+      // Start animation
+      animate();
+    }
+
+    function createSphereGrid() {
+      sphereGrid = new THREE.Group();
+      group.add(sphereGrid);
+
+      const { latSegments, lonSegments, baseRadius, sphereColor } = settings;
+      const gridRadius = baseRadius;  // Grid is created at base radius, then scaled
+
+      for (let i = 0; i < latSegments; i++) {
+        const theta1 = i * Math.PI / latSegments;
+        const theta2 = (i + 1) * Math.PI / latSegments;
+
+        for (let j = 0; j < lonSegments; j++) {
+          const phi1 = j * 2 * Math.PI / lonSegments;
+          const phi2 = (j + 1) * 2 * Math.PI / lonSegments;
+
+          // Create vertices for the cell
+          const v1 = new THREE.Vector3(
+            Math.sin(theta1) * Math.cos(phi1),
+            Math.cos(theta1),
+            Math.sin(theta1) * Math.sin(phi1)
+          ).multiplyScalar(gridRadius);
+
+          const v2 = new THREE.Vector3(
+            Math.sin(theta2) * Math.cos(phi1),
+            Math.cos(theta2),
+            Math.sin(theta2) * Math.sin(phi1)
+          ).multiplyScalar(gridRadius);
+
+          const v3 = new THREE.Vector3(
+            Math.sin(theta2) * Math.cos(phi2),
+            Math.cos(theta2),
+            Math.sin(theta2) * Math.sin(phi2)
+          ).multiplyScalar(gridRadius);
+
+          const v4 = new THREE.Vector3(
+            Math.sin(theta1) * Math.cos(phi2),
+            Math.cos(theta1),
+            Math.sin(theta1) * Math.sin(phi2)
+          ).multiplyScalar(gridRadius);
+
+          // Create cell geometry
+          const cellGeometry = new THREE.BufferGeometry();
+          const vertices = new Float32Array([
+            v1.x, v1.y, v1.z,
+            v2.x, v2.y, v2.z,
+            v3.x, v3.y, v3.z,
+            v1.x, v1.y, v1.z,
+            v3.x, v3.y, v3.z,
+            v4.x, v4.y, v4.z
+          ]);
+
+          cellGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+          cellGeometry.computeVertexNormals();
+
+          // Create cell material
+          const cellMaterial = new THREE.MeshBasicMaterial({
+            color: sphereColor,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.5
+          });
+
+          // Create cell mesh
+          const cellMesh = new THREE.Mesh(cellGeometry, cellMaterial);
+          cellMesh.userData = { latIndex: i, lonIndex: j, flashing: false };
+          sphereGrid.add(cellMesh);
+          sphereCells.push(cellMesh);
+        }
+      }
+    }
+
+    function createParticleSystem() {
+      innerGroup = new THREE.Group();
+      group.add(innerGroup);
+
+      const { maxParticleCount, particleCount, baseRadius, dotColor, lineColor } = settings;
+      const initRadius = baseRadius;  // Use base radius for initial particle positions
+
+      // Prepare arrays for line positions and colors
+      const segments = maxParticleCount * maxParticleCount;
+      positions = new Float32Array(segments * 3);
+      colors = new Float32Array(segments * 3);
+
+      // Create dot material - white particles, size 1.5 matches original
+      const dotMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 1.5,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        sizeAttenuation: true
+      });
+
+      // Create particle geometry
+      particles = new THREE.BufferGeometry();
+      particlePositions = new Float32Array(maxParticleCount * 3);
+
+      // Initialize particle positions
+      for (let i = 0; i < maxParticleCount; i++) {
+        // Generate random position within sphere
+        const u = Math.random();
+        const v = Math.random();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        const rPoint = initRadius * Math.cbrt(Math.random());
+
+        // Convert to Cartesian coordinates
+        const x = rPoint * Math.sin(phi) * Math.cos(theta);
+        const y = rPoint * Math.sin(phi) * Math.sin(theta);
+        const z = rPoint * Math.cos(phi);
+
+        // Set position
+        particlePositions[i * 3] = x;
+        particlePositions[i * 3 + 1] = y;
+        particlePositions[i * 3 + 2] = z;
+
+        // Store particle data (velocity, connections)
+        particlesData.push({
+          velocity: new THREE.Vector3(
+            -1 + Math.random() * 2,
+            -1 + Math.random() * 2,
+            -1 + Math.random() * 2
+          ),
+          numConnections: 0
+        });
+      }
+
+      // Set particle attributes
+      particles.setDrawRange(0, particleCount);
+      particles.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3).setUsage(THREE.DynamicDrawUsage));
+
+      // Create point cloud
+      pointCloud = new THREE.Points(particles, dotMaterial);
+      innerGroup.add(pointCloud);
+
+      // Create line material — color is white so vertex colors control everything
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        vertexColors: true,
+        blending: THREE.AdditiveBlending,
+        transparent: true
+      });
+
+      // Create line geometry
+      const lineGeometry = new THREE.BufferGeometry();
+      lineGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
+      lineGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3).setUsage(THREE.DynamicDrawUsage));
+      lineGeometry.computeBoundingSphere();
+      lineGeometry.setDrawRange(0, 0);
+
+      // Create line mesh
+      linesMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
+      innerGroup.add(linesMesh);
+    }
+
+    function flashCell(cellIndex) {
+      if (cellIndex < 0 || cellIndex >= sphereCells.length) return;
+
+      const cell = sphereCells[cellIndex];
+      if (cell && !cell.userData.flashing && !cell.userData.policeFlashing) {
+        // Sub-agent crash: police flash instead of normal sustain
+        if (subagentCrashed) {
+          policeFlashCell(cellIndex);
+          return;
+        }
+
+        cell.userData.flashing = true;
+        cell.material.color.set(settings.flashColor);
+
+        // Pick sustain color from palette (addressable multi-color)
+        const sustainColor = pickSustainColor();
+
+        setTimeout(() => {
+          cell.material.color.set(sustainColor);
+          fadeCellColor(
+            cell,
+            sustainColor,
+            new THREE.Color(settings.sphereColor),
+            settings.decayTime
+          );
+        }, 100);
+      }
+    }
+
+    function policeFlashCell(cellIndex) {
+      if (cellIndex < 0 || cellIndex >= sphereCells.length) return;
+      const cell = sphereCells[cellIndex];
+      if (cell.userData.policeFlashing) return;
+
+      cell.userData.policeFlashing = true;
+      cell.userData.flashing = true;
+      const startTime = Date.now();
+      let colorIndex = 0;
+
+      function policeCycle() {
+        if (!cell.userData.policeFlashing) return;
+
+        const elapsed = Date.now() - startTime;
+        if (elapsed >= POLICE_HOLD_MS) {
+          cell.userData.policeFlashing = false;
+          const fadeFrom = cell.material.color.clone();
+          fadeCellColor(cell, fadeFrom, new THREE.Color(settings.sphereColor), settings.decayTime);
+          return;
+        }
+
+        cell.material.color.set(POLICE_COLORS[colorIndex % POLICE_COLORS.length]);
+        colorIndex++;
+        setTimeout(policeCycle, POLICE_CYCLE_MS);
+      }
+
+      policeCycle();
+    }
+
+    function fadeCellColor(cell, fromColor, toColor, duration) {
+      const startTime = Date.now();
+
+      function fade() {
+        const elapsed = Date.now() - startTime;
+        const t = Math.min(elapsed / duration, 1);
+
+        const r = fromColor.r + (toColor.r - fromColor.r) * t;
+        const g = fromColor.g + (toColor.g - fromColor.g) * t;
+        const b = fromColor.b + (toColor.b - fromColor.b) * t;
+
+        cell.material.color.setRGB(r, g, b);
+
+        if (t < 1) {
+          requestAnimationFrame(fade);
+        } else {
+          cell.userData.flashing = false;
+        }
+      }
+
+      fade();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Native Visualizer provides real-time synced audio levels
+      // Smooth audio level for natural visualization (match AudioKinetics)
+      smoothedAudioLevel = smoothedAudioLevel + (audioLevel - smoothedAudioLevel) * 0.15;
+
+      // Calculate target radius based on audio level
+      targetRadius = settings.minRadius + (settings.maxRadius - settings.minRadius) * smoothedAudioLevel;
+
+      // Smooth lerp for natural pulsing - match AudioKinetics original
+      // dampFactor of 0.5 gives smooth chase without "puffing out"
+      const dampFactor = 0.5;
+      containerRadius = containerRadius + (targetRadius - containerRadius) * dampFactor;
+
+      // Scale the sphere grid to match container radius
+      const scale = containerRadius / settings.baseRadius;
+      sphereGrid.scale.set(scale, scale, scale);
+
+      const { particleCount, latSegments, lonSegments, minDistance, limitConnections, maxConnections } = settings;
+
+      // Speed multiplier based on audio
+      const speedMultiplier = isPlaying ? (1 + audioLevel * 2) : 1;
+
+      // Reset connection counts
+      for (let i = 0; i < particleCount; i++) {
+        particlesData[i].numConnections = 0;
+      }
+
+      let vertexpos = 0;
+      let colorpos = 0;
+      let numConnected = 0;
+
+      // Periodic smooth direction perturbation to break convergence patterns
+      const now = Date.now();
+
+      // Trigger new perturbation every 90 seconds
+      if (!perturbActive && now - lastPerturbTime > PERTURB_INTERVAL) {
+        lastPerturbTime = now;
+        perturbActive = true;
+        perturbStartTime = now;
+        perturbTargets = [];
+        const count = settings.particleCount;
+        for (let i = 0; i < count; i++) {
+          if (Math.random() < 0.5) {
+            const v = particlesData[i].velocity;
+            const speed = v.length();
+            const axis = new THREE.Vector3(
+              -1 + Math.random() * 2,
+              -1 + Math.random() * 2,
+              -1 + Math.random() * 2
+            ).normalize();
+            const angle = (15 + Math.random() * 45) * Math.PI / 180;
+            const original = v.clone();
+            const target = v.clone().applyAxisAngle(axis, angle).normalize().multiplyScalar(speed);
+            perturbTargets.push({ index: i, original, target, speed });
+          }
+        }
+      }
+
+      // Smoothly interpolate during transition
+      if (perturbActive) {
+        let progress = (now - perturbStartTime) / PERTURB_DURATION;
+        if (progress >= 1) {
+          progress = 1;
+          perturbActive = false;
+        }
+        const t = progress * progress * (3 - 2 * progress); // smoothstep
+        for (const entry of perturbTargets) {
+          const v = particlesData[entry.index].velocity;
+          v.copy(entry.original).lerp(entry.target, t);
+          v.normalize().multiplyScalar(entry.speed);
+        }
+        if (!perturbActive) perturbTargets = [];
+      }
+
+      // Update particle positions and handle collisions
+      for (let i = 0; i < particleCount; i++) {
+        const particleData = particlesData[i];
+
+        // Update position with velocity (scaled by audio)
+        particlePositions[i * 3] += particleData.velocity.x * speedMultiplier;
+        particlePositions[i * 3 + 1] += particleData.velocity.y * speedMultiplier;
+        particlePositions[i * 3 + 2] += particleData.velocity.z * speedMultiplier;
+
+        // Get current position
+        const x = particlePositions[i * 3];
+        const y = particlePositions[i * 3 + 1];
+        const z = particlePositions[i * 3 + 2];
+
+        // Check distance from center
+        const dist = Math.sqrt(x * x + y * y + z * z);
+
+        // Handle collision with sphere boundary
+        if (dist > containerRadius) {
+          // Get normal at collision point
+          const normal = new THREE.Vector3(x, y, z).normalize();
+
+          // Move particle to boundary
+          particlePositions[i * 3] = normal.x * containerRadius;
+          particlePositions[i * 3 + 1] = normal.y * containerRadius;
+          particlePositions[i * 3 + 2] = normal.z * containerRadius;
+
+          // Calculate cell coordinates for collision point
+          const theta = Math.acos(y / containerRadius);
+          let phi = Math.atan2(z, x);
+          if (phi < 0) phi += 2 * Math.PI;
+
+          const latIndex = Math.floor(theta / (Math.PI / latSegments));
+          const lonIndex = Math.floor(phi / ((2 * Math.PI) / lonSegments));
+          const cellIndex = latIndex * lonSegments + lonIndex;
+
+          // Flash the cell on collision
+          flashCell(cellIndex);
+
+          // Bounce the particle
+          particleData.velocity.reflect(normal);
+        }
+
+        // Create connections between nearby particles
+        for (let j = i + 1; j < particleCount; j++) {
+          const particleDataB = particlesData[j];
+
+          // Skip if max connections reached
+          if (limitConnections && particleData.numConnections >= maxConnections) continue;
+          if (limitConnections && particleDataB.numConnections >= maxConnections) continue;
+
+          // Calculate distance
+          const dx = particlePositions[i * 3] - particlePositions[j * 3];
+          const dy = particlePositions[i * 3 + 1] - particlePositions[j * 3 + 1];
+          const dz = particlePositions[i * 3 + 2] - particlePositions[j * 3 + 2];
+          const distParticles = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+          // Create connection if particles are close enough
+          if (distParticles < minDistance) {
+            particleData.numConnections++;
+            particleDataB.numConnections++;
+
+            // Connection opacity
+            const alpha = 1.0 - distParticles / minDistance;
+
+            // Add line positions
+            positions[vertexpos++] = particlePositions[i * 3];
+            positions[vertexpos++] = particlePositions[i * 3 + 1];
+            positions[vertexpos++] = particlePositions[i * 3 + 2];
+
+            positions[vertexpos++] = particlePositions[j * 3];
+            positions[vertexpos++] = particlePositions[j * 3 + 1];
+            positions[vertexpos++] = particlePositions[j * 3 + 2];
+
+            // Add line colors (addressable — color from palette * alpha)
+            const lc = pickLineColor();
+            colors[colorpos++] = lc.r * alpha;
+            colors[colorpos++] = lc.g * alpha;
+            colors[colorpos++] = lc.b * alpha;
+            colors[colorpos++] = lc.r * alpha;
+            colors[colorpos++] = lc.g * alpha;
+            colors[colorpos++] = lc.b * alpha;
+
+            numConnected++;
+          }
+        }
+      }
+
+      // Update line meshes
+      linesMesh.geometry.setDrawRange(0, numConnected * 2);
+      linesMesh.geometry.attributes.position.needsUpdate = true;
+      linesMesh.geometry.attributes.color.needsUpdate = true;
+
+      // Update particle positions
+      pointCloud.geometry.attributes.position.needsUpdate = true;
+
+      // Slowly rotate the whole visualization
+      const time = Date.now() * 0.001;
+      group.rotation.y = time * 0.1;
+
+      // Render the scene
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('container');
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    // API for Android to call
+    window.setAudioLevel = function(level) {
+      audioLevel = Math.max(0, Math.min(1, level));
+    };
+
+    window.setPlaying = function(playing) {
+      isPlaying = playing;
+    };
+
+    window.setClaudeState = function(state) {
+      // Guard: don't apply if scene isn't initialized yet
+      if (!scene || !sphereGrid || !linesMesh || !pointCloud) return;
+
+      // Avoid redundant state changes
+      if (state === currentClaudeState) return;
+      currentClaudeState = state;
+
+      if (state === 'processing') {
+        // Processing: sustain palette becomes green, lines orange
+        settings.sustainColor = 0x80FF00;
+        sustainColorPalette.length = 0;
+        sustainColorPalette.push({ color: new THREE.Color(0x80FF00), weight: 1.0 });
+        lineColorPalette.length = 0;
+        lineColorPalette.push({ color: new THREE.Color(defaultColors.lineColor), weight: 1.0 });
+
+      } else if (state === 'processing_subagent') {
+        // Processing + sub-agent active: 50% of cells sustain purple instead of green
+        settings.sustainColor = 0x80FF00;
+        sustainColorPalette.length = 0;
+        sustainColorPalette.push({ color: new THREE.Color(0x80FF00), weight: 0.5 });
+        sustainColorPalette.push({ color: new THREE.Color(0xFF8080), weight: 0.5 });
+        lineColorPalette.length = 0;
+        lineColorPalette.push({ color: new THREE.Color(defaultColors.lineColor), weight: 1.0 });
+
+      } else if (state === 'processing_subagent_stale') {
+        // Processing + sub-agent stale: 50% of cells sustain amber instead of green
+        settings.sustainColor = 0x80FF00;
+        sustainColorPalette.length = 0;
+        sustainColorPalette.push({ color: new THREE.Color(0x80FF00), weight: 0.5 });
+        sustainColorPalette.push({ color: new THREE.Color(0xFF7F00), weight: 0.5 });
+        lineColorPalette.length = 0;
+        lineColorPalette.push({ color: new THREE.Color(defaultColors.lineColor), weight: 1.0 });
+
+      } else if (state === 'stopped') {
+        // Stopped: everything gray
+        settings.sustainColor = 0xA4A4A4;
+        settings.flashColor = 0xA4A4A4;
+
+        sustainColorPalette.length = 0;
+        sustainColorPalette.push({ color: new THREE.Color(0xA4A4A4), weight: 1.0 });
+
+        lineColorPalette.length = 0;
+        lineColorPalette.push({ color: new THREE.Color(0xA4A4A4), weight: 1.0 });
+
+        // Fade all currently lit cells to gray
+        for (let i = 0; i < sphereCells.length; i++) {
+          const cell = sphereCells[i];
+          if (cell.userData.flashing) {
+            cell.material.color.set(0xA4A4A4);
+          }
+        }
+
+      } else {
+        // Idle: restore all default palettes
+        settings.sustainColor = defaultColors.sustainColor;
+        settings.flashColor = defaultColors.flashColor;
+        settings.sphereColor = defaultColors.sphereColor;
+        settings.dotColor = defaultColors.dotColor;
+
+        sustainColorPalette.length = 0;
+        sustainColorPalette.push({ color: new THREE.Color(defaultColors.sustainColor), weight: 1.0 });
+
+        lineColorPalette.length = 0;
+        lineColorPalette.push({ color: new THREE.Color(defaultColors.lineColor), weight: 1.0 });
+
+        // Restore non-flashing cells to default sphere color
+        for (let i = 0; i < sphereCells.length; i++) {
+          const cell = sphereCells[i];
+          if (!cell.userData.flashing) {
+            cell.material.color.set(defaultColors.sphereColor);
+          }
+        }
+      }
+    };
+
+    // API: Set MCP server health — controls line color tint
+    window.setMcpState = function(alive) {
+      if (!linesMesh) return;
+      if (alive) {
+        // Restore lines to current state's color
+        lineColorPalette.length = 0;
+        if (currentClaudeState === 'stopped') {
+          lineColorPalette.push({ color: new THREE.Color(0xA4A4A4), weight: 1.0 });
+        } else {
+          lineColorPalette.push({ color: new THREE.Color(defaultColors.lineColor), weight: 1.0 });
+        }
+      } else {
+        // MCP dead: lines turn dark brown
+        lineColorPalette.length = 0;
+        lineColorPalette.push({ color: new THREE.Color(0x402000), weight: 1.0 });
+      }
+    };
+
+    // API: Set sustain color distribution
+    // Example: setSustainColors([{color: 0xFF0000, weight: 0.5}, {color: 0x800080, weight: 0.5}])
+    // 50% of cell hits sustain red, 50% sustain purple
+    window.setSustainColors = function(colorDistribution) {
+      sustainColorPalette.length = 0;
+      for (const entry of colorDistribution) {
+        sustainColorPalette.push({ color: new THREE.Color(entry.color), weight: entry.weight });
+      }
+    };
+
+    // API: Set line color distribution
+    // Example: setLineColors([{color: 0x00FF00, weight: 0.4}, {color: 0xFCB45B, weight: 0.6}])
+    // 40% green lines, 60% orange lines
+    window.setLineColors = function(colorDistribution) {
+      lineColorPalette.length = 0;
+      for (const entry of colorDistribution) {
+        lineColorPalette.push({ color: new THREE.Color(entry.color), weight: entry.weight });
+      }
+    };
+
+    // API: Trigger police flash on a specific cell
+    window.triggerPoliceFlash = function(cellIndex) {
+      policeFlashCell(cellIndex);
+    };
+
+    // API: Set sub-agent crash state — all cell hits become police flashes
+    window.setSubAgentCrashed = function(crashed) {
+      subagentCrashed = crashed;
+    };
+
+    // Initialize
+    init();
+  </script>
+</body>
+</html>

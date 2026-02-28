@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom sheet layout for PROCESS_TEXT text processing actions.
+     Note: The actual UI is rendered via Jetpack Compose ModalBottomSheet
+     in TextProcessingActivity.kt to match the app's Compose-based architecture.
+     This layout is provided as an XML reference/fallback. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#FF101010"
+    android:paddingTop="16dp"
+    android:paddingBottom="24dp">
+
+    <!-- Drag handle indicator -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="#FF4C4C4C" />
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Process Text"
+        android:textColor="#FFDEDEDE"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="8dp" />
+
+    <!-- Selected text preview -->
+    <TextView
+        android:id="@+id/selected_text_preview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFA4A4A4"
+        android:textSize="13sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="16dp" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#FF1A1A1A" />
+
+    <!-- Action: Add to Calendar -->
+    <TextView
+        android:id="@+id/action_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center_vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="Add to Calendar"
+        android:textColor="#FFDEDEDE"
+        android:textSize="16sp"
+        android:background="?android:attr/selectableItemBackground" />
+
+    <!-- Action: Add to Task -->
+    <TextView
+        android:id="@+id/action_task"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center_vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="Add to Task"
+        android:textColor="#FFDEDEDE"
+        android:textSize="16sp"
+        android:background="?android:attr/selectableItemBackground" />
+
+    <!-- Action: Examine Text -->
+    <TextView
+        android:id="@+id/action_examine"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center_vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="Examine Text"
+        android:textColor="#FFDEDEDE"
+        android:textSize="16sp"
+        android:background="?android:attr/selectableItemBackground" />
+
+    <!-- Action: Ask mK:a -->
+    <TextView
+        android:id="@+id/action_ask"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center_vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="Ask mK:a"
+        android:textColor="#FFDEDEDE"
+        android:textSize="16sp"
+        android:background="?android:attr/selectableItemBackground" />
+
+    <!-- Action: Summarize -->
+    <TextView
+        android:id="@+id/action_summarize"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center_vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="Summarize"
+        android:textColor="#FFDEDEDE"
+        android:textSize="16sp"
+        android:background="?android:attr/selectableItemBackground" />
+
+</LinearLayout>

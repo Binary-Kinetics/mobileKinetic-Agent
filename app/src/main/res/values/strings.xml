@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">mK:a</string>
+    <string name="accessibility_service_description">mK:a UI Automation Service. Enables Claude AI to interact with any app on your device — tap buttons, read screen content, navigate, and automate tasks across all applications.</string>
+    <string name="device_admin_description">mK:a Device Admin enables remote lock screen control through the API server.</string>
+    <string name="attribution_device_api">Device API Server</string>
+    <string name="attribution_tts_audio">TTS Audio Playback</string>
+    <string name="attribution_media">Media Codec and Playback</string>
+    <string name="attribution_location">Location Services</string>
+    <string name="attribution_bluetooth">Bluetooth LE</string>
+</resources>

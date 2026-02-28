@@ -1,0 +1,66 @@
+================================================================================
+WATCHDOG TIMEOUT: 2026-02-04T12:55:28.029722
+================================================================================
+PID:         10921
+Parent PID:  None
+Session:     None
+Description: Write operation timeout
+Duration:    120.0s
+
+Command:
+  Task tool spawned child
+
+STDERR (first 1000 chars):
+Sub-agent hung using non-existent tool
+
+Memory Info:
+MemTotal:       15957276 kB
+MemFree:          570636 kB
+MemAvailable:    2521096 kB
+Buffers:            1272 kB
+Cached:          6396812 kB
+
+================================================================================
+WATCHDOG TIMEOUT: 2026-02-04T12:59:21.105826
+================================================================================
+PID:         16832
+Parent PID:  None
+Session:     None
+Description: Write operation during quickref creation
+Duration:    120.0s
+
+Command:
+  Task tool spawned child
+
+STDERR (first 1000 chars):
+Sub-agent hung using non-existent tool
+
+Memory Info:
+MemTotal:       15957276 kB
+MemFree:          570084 kB
+MemAvailable:    2393016 kB
+Buffers:            1968 kB
+Cached:          6371852 kB
+
+================================================================================
+WATCHDOG TIMEOUT: 2026-02-04T13:02:06.735136
+================================================================================
+PID:         20725
+Parent PID:  None
+Session:     None
+Description: Watchdog timeout during wc command
+Duration:    120.0s
+
+Command:
+  Task tool spawned child
+
+STDERR (first 1000 chars):
+Sub-agent hung
+
+Memory Info:
+MemTotal:       15957276 kB
+MemFree:          499832 kB
+MemAvailable:    2274432 kB
+Buffers:            1968 kB
+Cached:          6357856 kB
+
