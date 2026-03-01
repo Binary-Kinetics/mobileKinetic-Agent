@@ -49,7 +49,7 @@ The AI needs to be good enough to reason through multi-step tool use. The provid
 
 **Voice.** Streaming TTS with pluggable providers (Kokoro, Android, ElevenLabs, OpenAI TTS). 3D audio visualization via Three.js.
 
-**QuickApps** You can ask for things that normally required an app to have access to.  This will craft applications on the fly and present then as web pages. For instance, if you need a level app, just ask. And in moments it makes the app on the fly which gets saved as a template for future use, and disassembled when done. If you have a lazy weekend. you can sit and make QuickApps for the tihings YOU find yourself needing.
+**QuickApps.** You can ask for things that normally required an app to have access to.  This will craft applications on the fly and present them as web pages. For instance, if you need a level app, just ask. And in moments it makes the app on the fly which gets saved as a template for future use, and disassembled when done. If you have a lazy weekend. you can sit and make QuickApps for the tihings YOU find yourself needing.
 
 ---
 
