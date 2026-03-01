@@ -41,6 +41,8 @@ The AI needs to be good enough to reason through multi-step tool use. The provid
 
 **Automation.** Calendar events, CalDAV task sync (JTX Board), Tasker integration, alarms, geofencing, accessibility-based UI automation.
 
+**On-Device LLM.** Little AIs helping big AIs. A locally embedded Gemma 3 1B runs on the GPU for three things: redacting sensitive information before it leaves the device, compressing conversation context to stretch the AI's context window, and building session summaries that carry context across conversations. The privacy filtering and context cleanup happen **entirely** on-device. Pan-session memory works, meh, now but has room to grow.
+
 **Memory.** On-device RAG with ONNX embeddings (all-MiniLM-L6-v2, 384-dim). Ebbinghaus-style decay. Remembers what gets used, forgets what doesn't.
 
 **Security.** Biometric vault backed by StrongBox Titan M2. AES-256-GCM field encryption inside SQLCipher database encryption.
