@@ -10,11 +10,11 @@ An AI agent platform for Android. Gives an AI direct access to your phone's hard
 
 ## This App Is Dangerous
 
-Not in a marketing way. In a "this AI can send texts, make phone calls, read your notifications, control your Bluetooth, and access your camera" way. Without root.
+Not in a fun edgy marketing way. In a "this AI can send texts, make phone calls, read your notifications, control your Bluetooth, and access your camera" way. Without root.
 
 49 permissions. 70 device API endpoints. 55 MCP tools. Full shell access through an embedded Linux terminal. This is as deep as you can get into Android without rooting it.
 
-It does what you tell it to do. If you tell it something stupid, it'll do that too. There are no training wheels. Understand what you're granting before you grant it.
+It does what you tell it to do. If you tell it something stupid, it'll do that too. There are no training wheels. Understand what you're granting before you grant it. I tried to imbed things that keep your details from being sent for inference, but ultimately YOU have to be careful,
 
 ---
 
