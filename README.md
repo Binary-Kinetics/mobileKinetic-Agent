@@ -188,13 +188,13 @@ TTS:
 
 ## A Personal Note
 
-I'm a retired guy going through pretty big life changes. Major move coming in Spring, new choices, figuring out what's next. I got into this project after I got caught up in what AI could do. I wanted to see how far I could push an agent on a phone, and it turned into something that sank its teeth in to me.
+I'm a retired guy going through pretty big life changes. Major move coming in Spring with new choices and figuring out what's next. I got into this project after I got caught up in what AI could do. I wanted to see how far I could push an agent on a phone and it turned into something that sank its teeth in to me.
 
-I built this with what I have: I used Claude as my AI, my own self-hosted TTS setup (Kokoro and LuxTTS on my home network), and my daily phone. That's it. One person,with a few late nights.
+I built this with what I have: I used Claude as my AI, built my own self-hosted TTS setup (Kokoro and LuxTTS on my home network), and used my daily phone. That's it. One person, with a few late nights.
 
-If I had more resources I'd love to dig deeper. More AI providers, more voice models, more devices, more automation. There's a lot of potential here, with a lot of bugs to catch, and I've only scratched the surface of what's possible.
+If I had more resources I'd love to dig deeper. More AI providers, more voice models, more devices, more automation. There's a lot of potential with a lot of bugs to catch, and I've only scratched the surface of what's possible.
 
-If you find this useful, fun, or even just interesting, and you want to see it grow, please consider donating. It helps cover API costs and gives me a reason to keep going with this.
+If you find this useful, fun, or even just interesting, and you want to see it grow, please consider donating. It helps cover API costs and gives me a what you need to keep going with this.
 
 <a href="https://www.paypal.com/donate/?hosted_button_id=QYLDXTFCSVKM8">
   <img src="https://img.shields.io/badge/Support_This_Project-PayPal-blue.svg?style=for-the-badge&logo=paypal" alt="Support via PayPal" />
