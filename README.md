@@ -8,7 +8,7 @@ An AI agent platform for Android. Gives an AI direct access to your phone's hard
 
 ---
 
-## This App Is Dangerous
+## Use With Care
 
 Not in a fun edgy marketing way. In a "this AI can send texts, make phone calls, read your notifications, control your Bluetooth, and access your camera" way. Without root.
 
