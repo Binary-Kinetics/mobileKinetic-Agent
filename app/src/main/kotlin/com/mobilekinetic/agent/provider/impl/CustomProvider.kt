@@ -22,14 +22,31 @@ class CustomProvider(
     baseUrl: String
 ) : AiProvider {
 
+    companion object {
+        private const val RELAY_URL = "http://10.10.255.222:7300"
+    }
+
     override val name: String = "Custom (OpenAI-Compatible)"
     override val id: String = "custom"
 
-    private val delegate = OpenAiProvider(
-        apiKey = apiKey.ifBlank { "not-needed" },
-        model = model,
-        baseUrl = baseUrl.trimEnd('/')
-    )
+    private val delegate: OpenAiProvider
+
+    init {
+        val effectiveUrl: String
+        val effectiveModel: String
+        if (baseUrl.trim() == "ClaudeCode") {
+            effectiveUrl = RELAY_URL
+            effectiveModel = "claude-code"
+        } else {
+            effectiveUrl = baseUrl.trimEnd('/')
+            effectiveModel = model
+        }
+        delegate = OpenAiProvider(
+            apiKey = apiKey.ifBlank { "not-needed" },
+            model = effectiveModel,
+            baseUrl = effectiveUrl
+        )
+    }
 
     // -----------------------------------------------------------------------
     // Delegate all AiProvider methods

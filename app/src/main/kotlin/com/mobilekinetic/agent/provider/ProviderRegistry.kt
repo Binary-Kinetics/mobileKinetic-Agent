@@ -1,6 +1,9 @@
 package com.mobilekinetic.agent.provider
 
 import com.mobilekinetic.agent.provider.impl.ClaudeCliProvider
+import com.mobilekinetic.agent.provider.impl.CustomProvider
+import com.mobilekinetic.agent.provider.impl.GeminiProvider
+import com.mobilekinetic.agent.provider.impl.OpenAiProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -96,6 +99,43 @@ class ProviderRegistry @Inject constructor(
     }
 
     /**
+     * Reconstruct providers from saved configuration so they survive app restarts.
+     */
+    private suspend fun registerSavedProviders() {
+        val customConfig = configStore.getProviderConfig("custom")
+        if (customConfig.isNotEmpty()) {
+            registerProvider(
+                CustomProvider(
+                    apiKey = customConfig["api_key"] ?: "",
+                    model = customConfig["model"] ?: "",
+                    baseUrl = customConfig["base_url"] ?: ""
+                )
+            )
+        }
+
+        val openaiConfig = configStore.getProviderConfig("openai")
+        if (openaiConfig.isNotEmpty()) {
+            registerProvider(
+                OpenAiProvider(
+                    apiKey = openaiConfig["api_key"] ?: "",
+                    model = openaiConfig["model"] ?: "gpt-4o",
+                    baseUrl = openaiConfig["base_url"] ?: "https://api.openai.com/v1"
+                )
+            )
+        }
+
+        val geminiConfig = configStore.getProviderConfig("gemini")
+        if (geminiConfig.isNotEmpty()) {
+            registerProvider(
+                GeminiProvider(
+                    apiKey = geminiConfig["api_key"] ?: "",
+                    model = geminiConfig["model"] ?: "gemini-2.0-flash"
+                )
+            )
+        }
+    }
+
+    /**
      * Initialize the registry on app startup.
      *
      * Reads the persisted active-provider selection and initializes it.
@@ -103,6 +143,7 @@ class ProviderRegistry @Inject constructor(
      * registered or fails to initialize.
      */
     suspend fun initializeActive() {
+        registerSavedProviders()
         val savedId = configStore.getActiveProviderId()
         val provider = _providers[savedId] ?: claudeCliProvider
 

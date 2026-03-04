@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.mobilekinetic.agent.provider.ProviderConfigField
 import com.mobilekinetic.agent.provider.ProviderConfigStore
 import com.mobilekinetic.agent.provider.ProviderRegistry
+import com.mobilekinetic.agent.provider.impl.CustomProvider
+import com.mobilekinetic.agent.provider.impl.GeminiProvider
+import com.mobilekinetic.agent.provider.impl.OpenAiProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -78,8 +81,33 @@ class ProviderSettingsViewModel @Inject constructor(
 
     fun saveAndActivate(providerId: String) {
         viewModelScope.launch {
+            val config = _configValues.value
+
             // Save config values
-            configStore.setProviderConfig(providerId, _configValues.value)
+            configStore.setProviderConfig(providerId, config)
+
+            // Rebuild the provider instance with updated config
+            providerRegistry.unregisterProvider(providerId)
+            val newProvider = when (providerId) {
+                "custom" -> CustomProvider(
+                    apiKey = config["api_key"] ?: "",
+                    model = config["model"] ?: "",
+                    baseUrl = config["base_url"] ?: ""
+                )
+                "openai" -> OpenAiProvider(
+                    apiKey = config["api_key"] ?: "",
+                    model = config["model"] ?: "gpt-4o",
+                    baseUrl = config["base_url"] ?: "https://api.openai.com/v1"
+                )
+                "gemini" -> GeminiProvider(
+                    apiKey = config["api_key"] ?: "",
+                    model = config["model"] ?: "gemini-2.0-flash"
+                )
+                else -> null
+            }
+            if (newProvider != null) {
+                providerRegistry.registerProvider(newProvider)
+            }
 
             // Switch active provider
             val error = providerRegistry.switchProvider(providerId)
