@@ -5,8 +5,64 @@
       "args": [
         "/data/user/0/com.mobilekinetic.agent/files/home/unified_device_mcp.py"
       ],
-      "description": "Unified Device MCP - 93 tools covering RAG memory, Tasker automation, all Tier 1 hardware APIs and Tier 2 system APIs",
-      "env": {}
+      "description": "Unified Device MCP - 59+ tools: device HW, control, comms, calendar, tasks, apps, shell, RAG, vault, RLM"
+    },
+    "tier1-device": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/mcp_tier1_server.py"
+      ],
+      "description": "Tier 1 Device API - 24 tools wrapping Kotlin device APIs (battery, wifi, SMS, calendar, sensors, etc.) via localhost:5563"
+    },
+    "tier2-system": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/mcp_tier2_server.py"
+      ],
+      "description": "Tier 2 System API - 14 tools wrapping Python system APIs (shell, files, packages, cron, proc) via localhost:5564"
+    },
+    "shell": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/mcp_shell_server.py"
+      ],
+      "description": "Shell MCP - 5 tools: shell_exec, grep_search, find_files, list_directory, read_file"
+    },
+    "tasker": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/mcp_tasker_server.py"
+      ],
+      "description": "Tasker MCP - 23 dynamically-loaded Tasker automation tools via localhost:5563/tasker/run"
+    },
+    "rag-memory": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/rag_mcp_server.py"
+      ],
+      "description": "RAG Memory MCP - search, add, health + semantic trigger tools (add/list/delete/search) via localhost:5562"
+    },
+    "camera": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/camera_mcp.py"
+      ],
+      "description": "Camera MCP - 1 tool: take_photo with configurable camera_id"
+    },
+    "secure-vault": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/secure_vault.py",
+        "mcp"
+      ],
+      "description": "Secure Vault MCP - 4 tools: vault_store, vault_get, vault_list, vault_delete (encrypted secrets)"
+    },
+    "agenda": {
+      "command": "/data/user/0/com.mobilekinetic.agent/files/usr/bin/python3",
+      "args": [
+        "/data/user/0/com.mobilekinetic.agent/files/home/agenda_mcp_server.py"
+      ],
+      "description": "Agenda MCP - 14 tools: goals, intentions, behaviors CRUD + session logging + context retrieval (port convention: 5567)"
     }
   }
 }

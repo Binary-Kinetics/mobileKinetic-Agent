@@ -3,7 +3,7 @@ package com.mobilekinetic.agent.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mobilekinetic.agent.claude.ClaudeProcessManager
+import com.mobilekinetic.agent.claude.ClaudeCodeManager
 import com.mobilekinetic.agent.data.model.ChatMessage
 import com.mobilekinetic.agent.data.model.Conversation
 import com.mobilekinetic.agent.data.model.MessageRole
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val claudeProcessManager: ClaudeProcessManager,
+    private val claudeProcessManager: ClaudeCodeManager,
     private val conversationRepository: ConversationRepository,
     private val toolMemory: ToolMemory,
     private val providerRegistry: ProviderRegistry
@@ -266,7 +266,7 @@ class ChatViewModel @Inject constructor(
     /**
      * Send a user message.
      * Routes to the appropriate backend based on the active provider:
-     * - "claude_cli" → ClaudeProcessManager (existing subprocess path)
+     * - "claude_cli" → ClaudeCodeManager (existing subprocess path)
      * - Any other provider → AiProvider.sendMessage() Flow
      */
     fun sendMessage(text: String) {
@@ -284,7 +284,7 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * Existing Claude CLI code path — sends via ClaudeProcessManager subprocess.
+     * Existing Claude CLI code path — sends via ClaudeCodeManager subprocess.
      * This method is the original sendMessage body, extracted without modification.
      */
     private fun sendViaClaude(text: String) {
@@ -640,13 +640,13 @@ class ChatViewModel @Inject constructor(
 
     // ---- Internal helpers ----
 
-    private fun handleClaudeMessage(message: ClaudeProcessManager.Message) {
+    private fun handleClaudeMessage(message: ClaudeCodeManager.Message) {
         when (message) {
-            is ClaudeProcessManager.AssistantMessage -> {
+            is ClaudeCodeManager.AssistantMessage -> {
                 // Extract text content from content blocks
-                val textParts = message.content.filterIsInstance<ClaudeProcessManager.TextBlock>()
-                val toolBlocks = message.content.filterIsInstance<ClaudeProcessManager.ToolUseBlock>()
-                val toolResults = message.content.filterIsInstance<ClaudeProcessManager.ToolResultBlock>()
+                val textParts = message.content.filterIsInstance<ClaudeCodeManager.TextBlock>()
+                val toolBlocks = message.content.filterIsInstance<ClaudeCodeManager.ToolUseBlock>()
+                val toolResults = message.content.filterIsInstance<ClaudeCodeManager.ToolResultBlock>()
 
                 // Remove streaming preview before adding final message
                 if (streamingMessageId != null) {
@@ -734,7 +734,7 @@ class ChatViewModel @Inject constructor(
                 }
             }
 
-            is ClaudeProcessManager.ResultMessage -> {
+            is ClaudeCodeManager.ResultMessage -> {
                 // Update conversation with session ID for future resume
                 if (message.sessionId.isNotBlank()) {
                     val conv = _currentConversation.value.copy(
@@ -771,7 +771,7 @@ class ChatViewModel @Inject constructor(
                 streamingMessageId = null
             }
 
-            is ClaudeProcessManager.StreamEvent -> {
+            is ClaudeCodeManager.StreamEvent -> {
                 // Handle real-time streaming deltas
                 val event = message.event
                 val eventType = event?.get("type")
@@ -903,7 +903,7 @@ class ChatViewModel @Inject constructor(
                 }
             }
 
-            is ClaudeProcessManager.SystemMessage -> {
+            is ClaudeCodeManager.SystemMessage -> {
                 // Log system messages but don't typically show them to user
                 // unless it's a process restart or error
                 when (message.subtype) {
@@ -921,7 +921,7 @@ class ChatViewModel @Inject constructor(
                 }
             }
 
-            is ClaudeProcessManager.ErrorMessage -> {
+            is ClaudeCodeManager.ErrorMessage -> {
                 val chatMsg = ChatMessage(
                     role = MessageRole.SYSTEM,
                     content = "Error: ${message.error}${if (message.details != null) "\n${message.details}" else ""}",
@@ -931,7 +931,7 @@ class ChatViewModel @Inject constructor(
                 appendMessage(chatMsg)
             }
 
-            is ClaudeProcessManager.UserMessageEcho -> {
+            is ClaudeCodeManager.UserMessageEcho -> {
                 // Typically ignore echoes -- we already added the user message
             }
         }

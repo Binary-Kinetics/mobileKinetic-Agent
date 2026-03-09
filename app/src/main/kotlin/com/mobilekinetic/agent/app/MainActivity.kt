@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ShareCompat
-import com.mobilekinetic.agent.claude.ClaudeProcessManager
+import com.mobilekinetic.agent.claude.ClaudeCodeManager
 import com.mobilekinetic.agent.device.api.DeviceApiServer
 import com.mobilekinetic.agent.device.api.ReceivedShareData
 import com.mobilekinetic.agent.ui.MobileKineticApp
@@ -59,7 +59,7 @@ private const val TAG = "MainActivity"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject lateinit var claudeProcessManager: ClaudeProcessManager
+    @Inject lateinit var claudeCodeManager: ClaudeCodeManager
     @Inject lateinit var settingsRepository: SettingsRepository
 
     // Permission launcher for RECORD_AUDIO (required by AudioVisualizerBridge)
@@ -189,7 +189,7 @@ class MainActivity : ComponentActivity() {
                     )
                     true -> MobileKineticApp(
                         terminalContent = { TerminalScreen() },
-                        onStopClaude = { claudeProcessManager.interrupt() }
+                        onStopClaude = { claudeCodeManager.interrupt() }
                     )
                 }
             }

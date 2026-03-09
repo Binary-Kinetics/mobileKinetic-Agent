@@ -15,7 +15,10 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.mobilekinetic.agent.claude.ClaudeProcessManager
+import com.mobilekinetic.agent.claude.ClaudeCodeManager
+import com.mobilekinetic.agent.claude.ContextSynthesizer
+import com.mobilekinetic.agent.claude.HeartbeatScheduler
+import com.mobilekinetic.agent.claude.AgendaManager
 import com.mobilekinetic.agent.terminal.emulator.TerminalSession
 import com.mobilekinetic.agent.terminal.emulator.TerminalSessionClient
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -53,7 +56,10 @@ class MobileKineticService : Service(), TerminalSessionClient {
     @Inject lateinit var ragHttpServer: RagHttpServer
     @Inject lateinit var deviceApiServer: DeviceApiServer
     @Inject lateinit var vaultHttpServer: VaultHttpServer
-    @Inject lateinit var claudeProcessManager: ClaudeProcessManager
+    @Inject lateinit var claudeCodeManager: ClaudeCodeManager
+    @Inject lateinit var contextSynthesizer: ContextSynthesizer
+    @Inject lateinit var heartbeatScheduler: HeartbeatScheduler
+    @Inject lateinit var agendaManager: AgendaManager
     @Inject lateinit var privacyGateRuleSync: PrivacyGateRuleSync
     @Inject lateinit var gemmaModelManager: GemmaModelManager
     @Inject lateinit var gemmaTextGenerator: GemmaTextGenerator
@@ -239,12 +245,46 @@ class MobileKineticService : Service(), TerminalSessionClient {
                 Log.e(TAG, "Tool catalog seeding failed (non-fatal)", e)
             }
 
-            // Start Claude process manager after RAG is available
+            // Synthesize dynamic CLAUDE.md context before starting Claude
             try {
-                claudeProcessManager.start()
-                Log.i(TAG, "Claude process manager started")
+                val claudeMd = contextSynthesizer.synthesize()
+                claudeCodeManager.setClaudeMdContent(claudeMd)
+                Log.i(TAG, "Context synthesized and CLAUDE.md content set (${claudeMd.length} chars)")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to start Claude process manager", e)
+                Log.e(TAG, "Failed to synthesize context (Claude will start without dynamic context)", e)
+            }
+
+            // Start Claude Code manager after RAG + context are available
+            try {
+                claudeCodeManager.start()
+                Log.i(TAG, "Claude Code manager started")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start Claude Code manager", e)
+            }
+
+            // Start heartbeat scheduler for periodic autonomous check-ins
+            try {
+                heartbeatScheduler.start(HeartbeatScheduler.HeartbeatConfig())
+                Log.i(TAG, "Heartbeat scheduler started")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start heartbeat scheduler", e)
+            }
+
+            // Send first-launch greeting if this is the first run
+            try {
+                val prefs = getSharedPreferences("mka_service", Context.MODE_PRIVATE)
+                if (!prefs.getBoolean("first_launch_greeting_sent", false)) {
+                    // Brief delay to let Claude Code fully initialize
+                    delay(3000)
+                    claudeCodeManager.sendMessage(
+                        "Hello! I just started for the first time. Please introduce yourself briefly, " +
+                        "confirm all systems are operational, and let me know you're ready."
+                    )
+                    prefs.edit().putBoolean("first_launch_greeting_sent", true).apply()
+                    Log.i(TAG, "First-launch greeting sent")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to send first-launch greeting", e)
             }
 
             // Seed RAG with bundled entries (runs after all servers + Gemma are up)
@@ -307,9 +347,12 @@ class MobileKineticService : Service(), TerminalSessionClient {
         gemmaTextGenerator.release()
         gemmaEmbeddingProvider.release()
         Log.i(TAG, "Gemma providers released")
-        // Shutdown Claude process manager
-        claudeProcessManager.stop()
-        Log.i(TAG, "Claude process manager stopped")
+        // Shutdown heartbeat scheduler
+        heartbeatScheduler.stop()
+        Log.i(TAG, "Heartbeat scheduler stopped")
+        // Shutdown Claude Code manager
+        claudeCodeManager.stop()
+        Log.i(TAG, "Claude Code manager stopped")
         privacyGateRuleSync.stop()
         Log.i(TAG, "Privacy gate rule sync stopped")
         vaultHttpServer.stop()

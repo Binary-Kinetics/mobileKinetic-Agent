@@ -24,7 +24,7 @@ object ScriptManager {
 
     /**
      * Main entry point. Call from MobileKineticService.onCreate() after servers are
-     * initialized but before ClaudeProcessManager.start().
+     * initialized but before ClaudeCodeManager.start().
      */
     fun init(context: Context) {
         val home = File(context.filesDir, "home")

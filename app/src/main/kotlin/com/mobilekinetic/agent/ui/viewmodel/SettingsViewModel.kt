@@ -2,7 +2,7 @@ package com.mobilekinetic.agent.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mobilekinetic.agent.claude.ClaudeProcessManager
+import com.mobilekinetic.agent.claude.ClaudeCodeManager
 import com.mobilekinetic.agent.data.preferences.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-    private val claudeProcessManager: ClaudeProcessManager
+    private val claudeProcessManager: ClaudeCodeManager
 ) : ViewModel() {
 
     val modelSelection: StateFlow<String> = settingsRepository.modelSelection
@@ -29,7 +29,7 @@ class SettingsViewModel @Inject constructor(
     val claudeLastError: StateFlow<String?> = claudeProcessManager.lastError
 
     // Live model list from API
-    val availableModels: StateFlow<List<ClaudeProcessManager.ModelInfo>> = claudeProcessManager.availableModels
+    val availableModels: StateFlow<List<ClaudeCodeManager.ModelInfo>> = claudeProcessManager.availableModels
     val isLoadingModels: StateFlow<Boolean> = claudeProcessManager.isLoadingModels
 
     fun refreshModels() {

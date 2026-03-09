@@ -28,6 +28,9 @@ import com.mobilekinetic.agent.data.rag.RagHttpServer
 import com.mobilekinetic.agent.data.rag.RagRepository
 import com.mobilekinetic.agent.data.rag.ToolMemory
 import com.mobilekinetic.agent.data.chat.ConversationRepository
+import com.mobilekinetic.agent.claude.AgendaManager
+import com.mobilekinetic.agent.claude.ContextSynthesizer
+import com.mobilekinetic.agent.claude.HeartbeatScheduler
 import com.mobilekinetic.agent.data.vault.CredentialVault
 import com.mobilekinetic.agent.data.vault.VaultHttpServer
 import com.mobilekinetic.agent.device.api.DeviceApiServer
@@ -181,4 +184,17 @@ object AppModule {
     fun provideBackupSettingsRepository(dataStore: DataStore<Preferences>): BackupSettingsRepository {
         return BackupSettingsRepository(dataStore)
     }
+
+    @Provides
+    @Singleton
+    fun provideContextSynthesizer(): ContextSynthesizer = ContextSynthesizer()
+
+    @Provides
+    @Singleton
+    fun provideAgendaManager(): AgendaManager = AgendaManager()
+
+    @Provides
+    @Singleton
+    fun provideHeartbeatScheduler(@ApplicationContext context: Context): HeartbeatScheduler =
+        HeartbeatScheduler(context)
 }

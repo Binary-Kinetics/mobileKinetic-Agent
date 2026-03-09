@@ -1,7 +1,7 @@
 package com.mobilekinetic.agent.provider.impl
 
 import android.util.Log
-import com.mobilekinetic.agent.claude.ClaudeProcessManager
+import com.mobilekinetic.agent.claude.ClaudeCodeManager
 import com.mobilekinetic.agent.provider.AiMessage
 import com.mobilekinetic.agent.provider.AiProvider
 import com.mobilekinetic.agent.provider.AiStreamEvent
@@ -20,30 +20,30 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * AiProvider implementation that wraps [ClaudeProcessManager].
+ * AiProvider implementation that wraps [ClaudeCodeManager].
  *
  * Bridges the subprocess-based Python orchestrator (which communicates via JSON
  * over stdin/stdout) to the unified Flow-based AiProvider API. The orchestrator
- * emits [ClaudeProcessManager.Message] variants on a SharedFlow; this provider
+ * emits [ClaudeCodeManager.Message] variants on a SharedFlow; this provider
  * collects those and maps them to [AiStreamEvent] instances.
  *
  * Design notes:
  *  - [sendMessage] launches a [callbackFlow] that subscribes to
- *    [ClaudeProcessManager.messages], converts each Message into one or more
- *    [AiStreamEvent]s, and completes when a [ClaudeProcessManager.ResultMessage]
+ *    [ClaudeCodeManager.messages], converts each Message into one or more
+ *    [AiStreamEvent]s, and completes when a [ClaudeCodeManager.ResultMessage]
  *    or terminal error is received.
  *  - Only the **last** user message is forwarded to the orchestrator. The
  *    orchestrator maintains its own conversation history within the session, so
  *    replaying the full message list would duplicate context.
- *  - Tool calls arrive inside [ClaudeProcessManager.AssistantMessage] content
- *    blocks as [ClaudeProcessManager.ToolUseBlock]. They are emitted as a
+ *  - Tool calls arrive inside [ClaudeCodeManager.AssistantMessage] content
+ *    blocks as [ClaudeCodeManager.ToolUseBlock]. They are emitted as a
  *    [AiStreamEvent.ToolCallStart] followed immediately by a [ToolCallEnd]
  *    because the orchestrator provides the full tool input in one shot (no
  *    streaming argument deltas).
  */
 @Singleton
 class ClaudeCliProvider @Inject constructor(
-    private val processManager: ClaudeProcessManager
+    private val processManager: ClaudeCodeManager
 ) : AiProvider {
 
     override val name: String = "Claude (CLI)"
@@ -100,14 +100,14 @@ class ClaudeCliProvider @Inject constructor(
             processManager.messages.collect { message ->
                 when (message) {
                     // ---- Assistant text / tool-use blocks ----
-                    is ClaudeProcessManager.AssistantMessage -> {
+                    is ClaudeCodeManager.AssistantMessage -> {
                         for (block in message.content) {
                             when (block) {
-                                is ClaudeProcessManager.TextBlock -> {
+                                is ClaudeCodeManager.TextBlock -> {
                                     trySend(AiStreamEvent.TextDelta(block.text))
                                 }
 
-                                is ClaudeProcessManager.ToolUseBlock -> {
+                                is ClaudeCodeManager.ToolUseBlock -> {
                                     val inputJson = block.input?.toString() ?: "{}"
                                     trySend(
                                         AiStreamEvent.ToolCallStart(
@@ -127,14 +127,14 @@ class ClaudeCliProvider @Inject constructor(
                                     trySend(AiStreamEvent.ToolCallEnd(block.id))
                                 }
 
-                                is ClaudeProcessManager.ThinkingBlock -> {
+                                is ClaudeCodeManager.ThinkingBlock -> {
                                     // Thinking blocks are internal chain-of-thought.
                                     // Surface them as text deltas wrapped in markers
                                     // so the UI layer can choose to display or hide.
                                     // (No dedicated AiStreamEvent variant exists.)
                                 }
 
-                                is ClaudeProcessManager.ToolResultBlock -> {
+                                is ClaudeCodeManager.ToolResultBlock -> {
                                     // Tool results flow back through the orchestrator;
                                     // they aren't directly surfaced to the AiProvider
                                     // consumer since the consumer is the one supplying
@@ -155,14 +155,14 @@ class ClaudeCliProvider @Inject constructor(
                     }
 
                     // ---- Streaming content_block_delta events ----
-                    is ClaudeProcessManager.StreamEvent -> {
+                    is ClaudeCodeManager.StreamEvent -> {
                         handleStreamEvent(message)?.let { event ->
                             trySend(event)
                         }
                     }
 
                     // ---- Terminal result with usage stats ----
-                    is ClaudeProcessManager.ResultMessage -> {
+                    is ClaudeCodeManager.ResultMessage -> {
                         val usage = message.usage
                         val inputTokens = usage
                             ?.get("input_tokens")?.jsonPrimitive?.intOrNull ?: 0
@@ -180,7 +180,7 @@ class ClaudeCliProvider @Inject constructor(
                     }
 
                     // ---- Process-level error ----
-                    is ClaudeProcessManager.ErrorMessage -> {
+                    is ClaudeCodeManager.ErrorMessage -> {
                         trySend(
                             AiStreamEvent.StreamError(
                                 message = message.error,
@@ -191,7 +191,7 @@ class ClaudeCliProvider @Inject constructor(
                     }
 
                     // ---- System messages (session info, hooks, restarts) ----
-                    is ClaudeProcessManager.SystemMessage -> {
+                    is ClaudeCodeManager.SystemMessage -> {
                         // Process restarts are surfaced as retryable errors.
                         if (message.subtype == "process_restart") {
                             trySend(
@@ -207,7 +207,7 @@ class ClaudeCliProvider @Inject constructor(
                     }
 
                     // ---- User message echo ----
-                    is ClaudeProcessManager.UserMessageEcho -> {
+                    is ClaudeCodeManager.UserMessageEcho -> {
                         // Echo of our own message; ignore.
                     }
                 }
@@ -267,7 +267,7 @@ class ClaudeCliProvider @Inject constructor(
     // -------------------------------------------------------------------------
 
     /**
-     * Extracts an [AiStreamEvent] from a [ClaudeProcessManager.StreamEvent].
+     * Extracts an [AiStreamEvent] from a [ClaudeCodeManager.StreamEvent].
      *
      * StreamEvents carry a raw JSON `event` object whose shape follows the
      * Anthropic streaming format. The `type` field determines the kind of
@@ -278,7 +278,7 @@ class ClaudeCliProvider @Inject constructor(
      *  - `content_block_stop` -> [AiStreamEvent.ToolCallEnd] (if we're tracking a tool)
      */
     private fun handleStreamEvent(
-        streamEvent: ClaudeProcessManager.StreamEvent
+        streamEvent: ClaudeCodeManager.StreamEvent
     ): AiStreamEvent? {
         val event = streamEvent.event ?: return null
         val eventType = event["type"]?.jsonPrimitive?.content ?: return null

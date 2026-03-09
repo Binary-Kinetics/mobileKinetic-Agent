@@ -81,7 +81,7 @@ import com.mobilekinetic.agent.ui.theme.LcarsGreen
 import com.mobilekinetic.agent.ui.theme.LcarsOrange
 import com.mobilekinetic.agent.ui.theme.LcarsSubduedCool
 import com.mobilekinetic.agent.ui.theme.LcarsSubduedWarm
-import com.mobilekinetic.agent.claude.ClaudeProcessManager
+import com.mobilekinetic.agent.claude.ClaudeCodeManager
 import com.mobilekinetic.agent.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
 
@@ -259,9 +259,9 @@ fun SettingsScreen(
         val isLoadingModels by viewModel.isLoadingModels.collectAsState()
 
         val fallbackModels = listOf(
-            ClaudeProcessManager.ModelInfo("claude-opus-4-20250514", "Claude Opus 4", ""),
-            ClaudeProcessManager.ModelInfo("claude-sonnet-4-20250514", "Claude Sonnet 4", ""),
-            ClaudeProcessManager.ModelInfo("claude-haiku-3-5-20241022", "Claude Haiku 3.5", "")
+            ClaudeCodeManager.ModelInfo("claude-opus-4-20250514", "Claude Opus 4", ""),
+            ClaudeCodeManager.ModelInfo("claude-sonnet-4-20250514", "Claude Sonnet 4", ""),
+            ClaudeCodeManager.ModelInfo("claude-haiku-3-5-20241022", "Claude Haiku 3.5", "")
         )
 
         // Trigger refresh when dialog opens if orchestrator is running

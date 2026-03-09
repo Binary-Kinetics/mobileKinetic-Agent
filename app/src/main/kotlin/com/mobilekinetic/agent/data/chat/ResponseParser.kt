@@ -159,4 +159,37 @@ object ResponseParser {
         return voiceTagPattern.containsMatchIn(rawResponse) ||
                displayTagPattern.containsMatchIn(rawResponse)
     }
+
+    /**
+     * Strip all voice/display tags, returning plain text content.
+     * Absorbs Python agent_orchestrator.py strip_voice_tags + strip_display_tags.
+     */
+    fun stripAllTags(text: String): String {
+        return text
+            .replace(voiceTagPattern) { it.groupValues[1] }
+            .replace(displayTagPattern) { it.groupValues[1] }
+            .trim()
+    }
+
+    /**
+     * Extract only voice segments as a list of strings.
+     * Absorbs Python agent_orchestrator.py extract_voice_segments.
+     */
+    fun extractVoiceSegments(text: String): List<String> {
+        return voiceTagPattern.findAll(text)
+            .map { it.groupValues[1].trim() }
+            .filter { it.isNotBlank() }
+            .toList()
+    }
+
+    /**
+     * Route voice content to TTS — returns cleaned voice text ready for speech.
+     * Absorbs Python agent_orchestrator.py _route_voice.
+     * Returns null if no voice content found.
+     */
+    fun routeVoice(rawResponse: String): String? {
+        val parsed = parse(rawResponse)
+        if (!parsed.hasVoice) return null
+        return cleanForVoice(parsed.voiceContent)
+    }
 }
